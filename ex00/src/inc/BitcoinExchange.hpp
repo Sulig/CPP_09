@@ -6,7 +6,7 @@
 /*   By: sadoming <sadoming@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/18 16:29:08 by sadoming          #+#    #+#             */
-/*   Updated: 2025/08/18 19:51:27 by sadoming         ###   ########.fr       */
+/*   Updated: 2025/08/25 19:54:16 by sadoming         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,24 +15,34 @@
 
 # include <iostream>
 # include <fstream>
+# include <sstream>
+# include <cstdlib>
 # include <ctime>
 # include <map>
+# include <sstream>
 # include <string>
+
+# define EXIT_SUCESS	0
+# define DATABASE		"data.csv"
 
 class BitcoinExchange
 {
 	private:
-		std::map<time_t, int>	_database;
-		std::map<time_t, int>	_input_toMap;
+		std::map<std::string, int>	_database;
+		std::map<std::string, int>	_input_toMap;
+		std::map<std::string, std::string>	_errors;
 
 	protected:
+		int		arrstrlen(std::string *arr);
+		int		ft_atoi(const std::string str);
 		long	fileWidth(const char *fileName);
+		std::string	*readFile(const char *fileName);
 		void	parseInput(const char *fileName);
 		void	parseDataBase(void);
 
 	public:
 		BitcoinExchange();
-		BitcoinExchange(std::string fileName);
+		BitcoinExchange(const char *fileName);
 		BitcoinExchange(const BitcoinExchange &other);
 		~BitcoinExchange();
 

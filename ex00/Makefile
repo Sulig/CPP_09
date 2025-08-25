@@ -6,11 +6,13 @@
 #    By: sadoming <sadoming@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/10 17:01:41 by sadoming          #+#    #+#              #
-#    Updated: 2025/08/14 19:02:30 by sadoming         ###   ########.fr        #
+#    Updated: 2025/08/25 17:16:42 by sadoming         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-NAME	:= btc
+NAME	:=	btc
+
+FILE	:=	"tests/input.txt"
 # ------------------ #
 # Flags:
 
@@ -69,9 +71,9 @@ author:
 #-------------------------------------------------------------#
 run: $(NAME)
 	@echo "$(C)\n~ **************************************** ~\n"
-	@echo " ~ Running ./$(NAME) "
+	@echo " ~ Running ./$(NAME) $(FILE)"
 	@echo "\n~ **************************************** ~ $(DEF)\n"
-	@./$(NAME)
+	@./$(NAME) $(FILE)
 #-------------------------------------------------------------#
 #-------------------------------------------------------------#
 # **************************************************************************** #
@@ -90,18 +92,32 @@ $(NAME): $(OBJS) $(MAK) $(HDR)
 # Debugging region:
 
 debug: $(NAME)
-	@echo " ~ Debugging ./$(NAME)"
-	@lldb $(NAME)
+	@echo " ~ Debugging ./$(NAME) $(FILE)"
+	@lldb $(NAME) $(FILE)
 
 # ------------------
 
 val: $(NAME)
-	@echo " ~ Running valgrind ./$(NAME)"
-	@valgrind ./$(NAME)
+	@echo " ~ Running valgrind ./$(NAME) $(FILE)"
+	@valgrind ./$(NAME) $(FILE)
 
 val-strict: $(NAME)
-	@echo " ~ Running valgrind ./$(NAME)"
-	@valgrind --leak-check=full --show-leak-kinds=all ./$(NAME)
+	@echo " ~ Running valgrind ./$(NAME) $(FILE)"
+	@valgrind --leak-check=full --show-leak-kinds=all ./$(NAME) $(FILE)
+
+# ------------------
+
+test: $(NAME)
+	@echo "$(Y) ~ Test in progress.. $(DEF)"
+	@echo "  - None imput	->"
+	@./$(NAME)
+	@echo "  - No existent file	->"
+	@./$(NAME) "404.txt"
+	@echo "  - Empty file	->"
+	@./$(NAME) "tests/empty"
+	@echo "  - Subject Example	->"
+	@./$(NAME) "tests/input.txt"
+	@echo "$(C) Thats all!! $(DEF)"
 # **************************************************************************** #
 # Clean region
 clean:

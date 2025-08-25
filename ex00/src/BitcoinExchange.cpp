@@ -6,11 +6,12 @@
 /*   By: sadoming <sadoming@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/18 16:29:30 by sadoming          #+#    #+#             */
-/*   Updated: 2025/08/18 20:02:05 by sadoming         ###   ########.fr       */
+/*   Updated: 2025/08/25 20:10:28 by sadoming         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "inc/BitcoinExchange.hpp"
+#include <iostream>
 
 	/*	TODO ->
 	*-	Read input
@@ -34,19 +35,19 @@
 	*/
 
 /* Constructor & destructor */
-BitcoinExchange::BitcoinExchange()
+BitcoinExchange::BitcoinExchange() { parseDataBase(); }
+BitcoinExchange::BitcoinExchange(const char *fileName)
 {
-
-}
-BitcoinExchange::BitcoinExchange(std::string fileName)
-{
-	//parse input
-
-	//parse DB
+	parseInput(fileName);
+	parseDataBase();
 	//btc
 }
 BitcoinExchange::BitcoinExchange(const BitcoinExchange &other) : _database(other._database), _input_toMap(other._input_toMap) {}
-BitcoinExchange::~BitcoinExchange() { }
+BitcoinExchange::~BitcoinExchange()
+{
+	_database.clear();
+	_input_toMap.clear();
+}
 /* ----- */
 
 /* Operator overloads */
@@ -60,6 +61,42 @@ BitcoinExchange &BitcoinExchange::operator=(const BitcoinExchange &other) {
 /* ----- */
 
 /* Utils	*/
+int	BitcoinExchange::arrstrlen(std::string *arr)
+{
+	int	size = 0;
+	if (arr)
+		while (!arr[size].empty())
+			size++;
+	return (size);
+}
+//** */
+int	BitcoinExchange::ft_atoi(const std::string str)
+{
+	int		cnt;
+	int		sign;
+	int		find;
+
+	find = '\0';
+	cnt = -1;
+	sign = 1;
+	while (str[++cnt] < 33)
+		if ((str[cnt] < 9 || str[cnt] > 13) && str[cnt] != ' ')
+			return ('\0');
+	if (str[cnt] == '-' || str[cnt] == '+')
+	{
+		if (str[cnt] == '-')
+			sign *= -1;
+		cnt++;
+	}
+	while (str[cnt] >= '0' && str[cnt] <= '9')
+	{
+		find *= 10;
+		find += str[cnt] - '0';
+		cnt++;
+	}
+	return (find * sign);
+}
+//** */
 long	BitcoinExchange::fileWidth(const char *fileName)
 {
 	std::ifstream	file;
@@ -71,7 +108,7 @@ long	BitcoinExchange::fileWidth(const char *fileName)
 	{
 		std::cout << fileName << std::endl;
 		std::cout << "File not found." << std::endl;
-		exit(1);
+		exit(0);
 	}
 	while (!file.eof())
 	{
@@ -85,7 +122,9 @@ long	BitcoinExchange::fileWidth(const char *fileName)
 	return (lines);
 }
 //** */
-void	BitcoinExchange::parseInput(const char *fileName)
+//TODO Date Checker
+//** */
+std::string	*BitcoinExchange::readFile(const char *fileName)
 {
 	std::ifstream	file;
 	long			lines;
@@ -94,7 +133,7 @@ void	BitcoinExchange::parseInput(const char *fileName)
 	if (lines == 0)
 	{
 		std::cout << "File is empty." << std::endl;
-		exit(0);
+		exit(EXIT_SUCESS);
 	}
 	//** */
 	file.open(fileName, std::ios::in);
@@ -110,27 +149,40 @@ void	BitcoinExchange::parseInput(const char *fileName)
 	fileContent[lines] = "";
 	file.close();
 	//** */
-	// TODO parsing
+	return (fileContent);
+}
+//** */
+void	BitcoinExchange::parseInput(const char *fileName)
+{
+	std::string	*fileContent = readFile(fileName);
+
+	for (int i = 1; i < arrstrlen(fileContent); i++)
+	{
+		std::stringstream _line(fileContent[i]);
+		std::string	date, value;
+		if (std::getline(_line, date, '|') && std::getline(_line, value))
+			_input_toMap[date] = ft_atoi(value);
+		else
+		{
+			_input_toMap["Error " + date] = 0;
+			_errors[date] = "Error: bad input => ";
+		}
+	}
+	delete [] fileContent;
 }
 //** */
 void	BitcoinExchange::parseDataBase()
 {
-	// TODO ->
-	//*- search DB in structure dir.
-	/*
-	file.open(fileName, std::ios::in);
-	// Create a string array to store the file content
-	std::string *fileContent = new std::string[lines + 1];
-	lines = 0;
-	while (!file.eof())
+	std::string	*fileContent = readFile(DATABASE);
+
+	for (int i = 1; i < arrstrlen(fileContent); i++)
 	{
-		std::string	line;
-		std::getline(file, line);
-		fileContent[lines++] = line;
+		std::stringstream _line(fileContent[i]);
+		std::string	date, value;
+		if (std::getline(_line, date, ',') && std::getline(_line, value))
+			_database[date] = ft_atoi(value);
 	}
-	fileContent[lines] = "";
-	file.close();
-	*/
+	delete [] fileContent;
 }
 /* ----- */
 
