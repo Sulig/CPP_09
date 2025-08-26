@@ -6,7 +6,7 @@
 /*   By: sadoming <sadoming@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/18 16:29:30 by sadoming          #+#    #+#             */
-/*   Updated: 2025/08/25 20:10:28 by sadoming         ###   ########.fr       */
+/*   Updated: 2025/08/26 20:12:54 by sadoming         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,7 @@ BitcoinExchange::~BitcoinExchange()
 {
 	_database.clear();
 	_input_toMap.clear();
+	_errors.clear();
 }
 /* ----- */
 
@@ -55,6 +56,7 @@ BitcoinExchange &BitcoinExchange::operator=(const BitcoinExchange &other) {
 	if (this != &other) {
 		_database = other._database;
 		_input_toMap = other._input_toMap;
+		_errors = other._errors;
 	}
 	return (*this);
 }
@@ -122,7 +124,41 @@ long	BitcoinExchange::fileWidth(const char *fileName)
 	return (lines);
 }
 //** */
-//TODO Date Checker
+bool	BitcoinExchange::dateChecker(std::string date_str)
+{
+	int		year, month, day;
+	char	sep1, sep2;
+	std::istringstream ss(date_str);
+
+	if (!(ss >> year >> sep1 >> month >> sep2 >> day) || sep1 != '-' || sep2 != '-')
+	{
+		std::cerr << "Error: invalid format in => " << date_str << std::endl;
+		return false;
+	}
+	if (day < 1 || day > 31 || month < 1 || month > 12)
+		return (false);
+	switch (month)
+	{
+		case 2:
+			if (year % 4 == 0 && year % 100)
+				if (day > 29)
+					return false;
+			if (day > 28)
+				return false;
+			break ;
+		case 1: case 3: case 5: case 7: case 8: case 10: case 12:
+			if (day > 31)
+				return false;
+			break ;
+		case 4: case 6: case 9: case 11:
+			if (day > 30)
+				return false;
+			break ;
+		default:
+			return false;
+	}
+	return (true);
+}
 //** */
 std::string	*BitcoinExchange::readFile(const char *fileName)
 {
@@ -180,7 +216,11 @@ void	BitcoinExchange::parseDataBase()
 		std::stringstream _line(fileContent[i]);
 		std::string	date, value;
 		if (std::getline(_line, date, ',') && std::getline(_line, value))
+		{
+			if (dateChecker(date) == false)
+				exit(EXIT_FAILURE);
 			_database[date] = ft_atoi(value);
+		}
 	}
 	delete [] fileContent;
 }

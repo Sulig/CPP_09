@@ -6,7 +6,7 @@
 /*   By: sadoming <sadoming@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/18 16:29:08 by sadoming          #+#    #+#             */
-/*   Updated: 2025/08/25 19:54:16 by sadoming         ###   ########.fr       */
+/*   Updated: 2025/08/26 18:43:12 by sadoming         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@ class BitcoinExchange
 	protected:
 		int		arrstrlen(std::string *arr);
 		int		ft_atoi(const std::string str);
+		bool	dateChecker(std::string date_str);
 		long	fileWidth(const char *fileName);
 		std::string	*readFile(const char *fileName);
 		void	parseInput(const char *fileName);

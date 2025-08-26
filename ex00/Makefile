@@ -6,13 +6,13 @@
 #    By: sadoming <sadoming@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/10 17:01:41 by sadoming          #+#    #+#              #
-#    Updated: 2025/08/25 17:16:42 by sadoming         ###   ########.fr        #
+#    Updated: 2025/08/26 17:29:43 by sadoming         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME	:=	btc
 
-FILE	:=	"tests/input.txt"
+FILE	:=	"tests/test.csv"
 # ------------------ #
 # Flags:
 
@@ -117,6 +117,8 @@ test: $(NAME)
 	@./$(NAME) "tests/empty"
 	@echo "  - Subject Example	->"
 	@./$(NAME) "tests/input.txt"
+	@echo "  - $(NAME) tests	->"
+	@./$(NAME) "tests/test.csv"
 	@echo "$(C) Thats all!! $(DEF)"
 # **************************************************************************** #
 # Clean region
