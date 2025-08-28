@@ -6,7 +6,7 @@
 /*   By: sadoming <sadoming@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/18 16:29:30 by sadoming          #+#    #+#             */
-/*   Updated: 2025/08/26 20:12:54 by sadoming         ###   ########.fr       */
+/*   Updated: 2025/08/28 18:03:34 by sadoming         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,26 +38,17 @@
 BitcoinExchange::BitcoinExchange() { parseDataBase(); }
 BitcoinExchange::BitcoinExchange(const char *fileName)
 {
-	parseInput(fileName);
 	parseDataBase();
-	//btc
+	btc(fileName);
 }
 BitcoinExchange::BitcoinExchange(const BitcoinExchange &other) : _database(other._database), _input_toMap(other._input_toMap) {}
-BitcoinExchange::~BitcoinExchange()
-{
-	_database.clear();
-	_input_toMap.clear();
-	_errors.clear();
-}
+BitcoinExchange::~BitcoinExchange() {	_database.clear();	}
 /* ----- */
 
 /* Operator overloads */
 BitcoinExchange &BitcoinExchange::operator=(const BitcoinExchange &other) {
-	if (this != &other) {
+	if (this != &other)
 		_database = other._database;
-		_input_toMap = other._input_toMap;
-		_errors = other._errors;
-	}
 	return (*this);
 }
 /* ----- */
@@ -72,33 +63,6 @@ int	BitcoinExchange::arrstrlen(std::string *arr)
 	return (size);
 }
 //** */
-int	BitcoinExchange::ft_atoi(const std::string str)
-{
-	int		cnt;
-	int		sign;
-	int		find;
-
-	find = '\0';
-	cnt = -1;
-	sign = 1;
-	while (str[++cnt] < 33)
-		if ((str[cnt] < 9 || str[cnt] > 13) && str[cnt] != ' ')
-			return ('\0');
-	if (str[cnt] == '-' || str[cnt] == '+')
-	{
-		if (str[cnt] == '-')
-			sign *= -1;
-		cnt++;
-	}
-	while (str[cnt] >= '0' && str[cnt] <= '9')
-	{
-		find *= 10;
-		find += str[cnt] - '0';
-		cnt++;
-	}
-	return (find * sign);
-}
-//** */
 long	BitcoinExchange::fileWidth(const char *fileName)
 {
 	std::ifstream	file;
@@ -108,8 +72,7 @@ long	BitcoinExchange::fileWidth(const char *fileName)
 	file.open(fileName, std::ios::in);
 	if (!file.is_open())
 	{
-		std::cout << fileName << std::endl;
-		std::cout << "File not found." << std::endl;
+		std::cout << "File " << fileName << " not found" << std::endl;
 		exit(0);
 	}
 	while (!file.eof())
@@ -140,9 +103,12 @@ bool	BitcoinExchange::dateChecker(std::string date_str)
 	switch (month)
 	{
 		case 2:
-			if (year % 4 == 0 && year % 100)
+			if (year % 4 == 0 && year % 100 != 0)
+			{
 				if (day > 29)
 					return false;
+				return true;
+			}
 			if (day > 28)
 				return false;
 			break ;
@@ -188,25 +154,6 @@ std::string	*BitcoinExchange::readFile(const char *fileName)
 	return (fileContent);
 }
 //** */
-void	BitcoinExchange::parseInput(const char *fileName)
-{
-	std::string	*fileContent = readFile(fileName);
-
-	for (int i = 1; i < arrstrlen(fileContent); i++)
-	{
-		std::stringstream _line(fileContent[i]);
-		std::string	date, value;
-		if (std::getline(_line, date, '|') && std::getline(_line, value))
-			_input_toMap[date] = ft_atoi(value);
-		else
-		{
-			_input_toMap["Error " + date] = 0;
-			_errors[date] = "Error: bad input => ";
-		}
-	}
-	delete [] fileContent;
-}
-//** */
 void	BitcoinExchange::parseDataBase()
 {
 	std::string	*fileContent = readFile(DATABASE);
@@ -219,7 +166,7 @@ void	BitcoinExchange::parseDataBase()
 		{
 			if (dateChecker(date) == false)
 				exit(EXIT_FAILURE);
-			_database[date] = ft_atoi(value);
+			_database[date] = std::strtod(value.c_str(), NULL);
 		}
 	}
 	delete [] fileContent;
@@ -227,5 +174,53 @@ void	BitcoinExchange::parseDataBase()
 /* ----- */
 
 /*	BTC	*/
+void	BitcoinExchange::btc(const char *fileName)
+{
+	if (_database.empty())
+		parseDataBase();
+
+	std::string	*fileContent = readFile(fileName);
+
+	for (int i = 1; i < arrstrlen(fileContent); i++)
+	{
+		std::stringstream _line(fileContent[i]);
+		std::string	date, value;
+		if (std::getline(_line, date, '|') && std::getline(_line, value))
+		{
+			if (dateChecker(date))
+			{
+				if (std::strtod(value.c_str(), NULL) < 0)
+					std::cout << "Error: not a positive number" << std::endl;
+				else if (std::strtod(value.c_str(), NULL) > INT_MAX)
+					std::cout << "Error: too large number" << std::endl;
+				else
+				{
+					std::map<std::string, double>::iterator	it = _database.lower_bound(date);
+					if (it != _database.end() && it->first == date)
+					{
+						double	result	= it->second * std::strtod(value.c_str(), NULL);
+						std::cout << date << "=> " << it->second << " = " << result << std::endl;
+					}
+					else
+					{
+						if (it == _database.begin())
+							std::cout << "Error: Date is lower than the first date in Database!" << std::endl;
+						else
+						{
+							--it;
+							double	result	= it->second * std::strtod(value.c_str(), NULL);
+							std::cout << date << "=> " << it->second << " = " << result << std::endl;
+						}
+					}
+				}
+			}
+			else
+				std::cout << "Error: bad date => " << _line.str() << std::endl;
+		}
+		else
+			std::cout << "Error: bad input => " << _line.str() << std::endl;
+	}
+	delete [] fileContent;
+}
 /* ----- */
 
