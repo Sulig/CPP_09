@@ -141,6 +141,9 @@ void	RPN::rpn(const char *arg)
 		}
 		_input.pop();
 	}
-	std::cout << _stack.top() << std::endl;
+	if (_stack.size() > 2)
+		std::cout << "Error: Insuficient operators!" << std::endl;
+	else
+		std::cout << _stack.top() << std::endl;
 }
 /* ----- */
