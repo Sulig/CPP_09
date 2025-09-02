@@ -6,33 +6,11 @@
 /*   By: sadoming <sadoming@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/18 16:29:30 by sadoming          #+#    #+#             */
-/*   Updated: 2025/08/28 18:03:34 by sadoming         ###   ########.fr       */
+/*   Updated: 2025/08/28 19:29:15 by sadoming         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "inc/BitcoinExchange.hpp"
-#include <iostream>
-
-	/*	TODO ->
-	*-	Read input
-	*-		- if incorrect (bad file or illegible) -> stop program
-	*-		- if correct -> parse to _input_toMap
-	*-	Read Database
-	*-		- if encountered	-> parse to _database
-	*-		- if 404			-> Cout error and exit program
-	*-	Read _input_toMap and perform corresponent action:
-	*	*-	Comprove if line is correct
-	*	*-	 That includes take care of:
-	*			- wrong date
-	*			- wrong number
-	*			- empty line
-	*	*-	If correct ->
-	*		-	get date and search it in database
-	*			** get the lower date next to the corresponent date.
-	*			** or return no-exist date (if date more low than database first date)
-	*		-	perform btc exchange and print.
-	*	*-	Repeat until EOF.
-	*/
 
 /* Constructor & destructor */
 BitcoinExchange::BitcoinExchange() { parseDataBase(); }
