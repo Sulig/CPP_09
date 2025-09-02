@@ -19,7 +19,7 @@ RPN::RPN(const char *arg)
 	_result = 0;
 	rpn(arg);
 }
-RPN::RPN(const RPN &other) : _stack(other._stack), _result(other._result) {}
+RPN::RPN(const RPN &other) : _input(other._input), _stack(other._stack), _result(other._result) {}
 RPN::~RPN() { }
 /* ----- */
 
@@ -29,6 +29,7 @@ RPN &RPN::operator=(const RPN &other)
 	if (this != &other)
 	{
 		_stack = other._stack;
+		_input = other._input;
 		_result = other._result;
 	}
 	return (*this);
