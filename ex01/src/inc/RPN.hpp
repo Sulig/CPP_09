@@ -6,7 +6,7 @@
 /*   By: sadoming <sadoming@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/28 18:47:18 by sadoming          #+#    #+#             */
-/*   Updated: 2025/09/01 20:05:12 by sadoming         ###   ########.fr       */
+/*   Updated: 2025/09/02 17:20:02 by sadoming         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,19 +14,22 @@
 # define RPN_HPP
 
 # include <iostream>
+# include <sstream>
 # include <string>
 # include <stack>
 
 class RPN
 {
 	private:
-		std::stack<char>	_stack;
+		std::stack<std::string>	_input;
+		std::stack<std::string>	_stack;
 		int	_result;
 
 	protected:
-		bool	isoperator(char c);
+		bool	isoperator(std::string c);
 		int		ft_atoi(const std::string str);
 		void	calculate(char op);
+		void	split(const char *to_split, char sep);
 
 	public:
 		RPN();
