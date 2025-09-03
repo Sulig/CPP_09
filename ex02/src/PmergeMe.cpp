@@ -13,12 +13,12 @@
 #include "inc/PmergeMe.hpp"
 
 /* Constructor & destructor */
-PmergeMe::PmergeMe() {  }
-PmergeMe::PmergeMe(const char *arg)
+PmergeMe::PmergeMe() { }
+PmergeMe::PmergeMe(const char **arg, int argc)
 {
-
+	checkArg(arg, argc);
 }
-PmergeMe::PmergeMe(const PmergeMe &other) {}
+PmergeMe::PmergeMe(const PmergeMe &other) : _vect(other._vect) {}
 PmergeMe::~PmergeMe() { }
 /* ----- */
 
@@ -27,7 +27,7 @@ PmergeMe &PmergeMe::operator=(const PmergeMe &other)
 {
 	if (this != &other)
 	{
-
+		_vect = other._vect;
 	}
 	return (*this);
 }
@@ -61,11 +61,47 @@ int	PmergeMe::ft_atoi(const std::string str)
 	return (find * sign);
 }
 //**/
+void	PmergeMe::checkArg(const char **arg, int argc)
+{
+	for (int i = 1; i < argc; i++)
+	{
+		if (arg[i][0] == '0')
+			continue ;
+		if (ft_atoi(arg[i]) == '\0')
+		{
+			std::cout << "Error: Unexpected character found!" << std::endl;
+			exit(EXIT_FAILURE);
+		}
+		if (ft_atoi(arg[i]) < 0)
+		{
+			std::cout << "Error: Negative number not suported!" << std::endl;
+			exit(EXIT_FAILURE);
+		}
+	}
+}
 /* ----- */
 
 /*	PmergeMe	*/
-void	PmergeMe::pmergeMe(const char *arg)
+void	PmergeMe::pmergeMe(const char **arg, int argc)
 {
+	//crono
+	//call vector?
+	vector(arg, argc);
+	//stop crono
 
+	//crono 2
+	//ccall //
+	//stop crono 2
 }
 /* ----- */
+
+// -- Solved with `Vector` zone -->
+#pragma region VECTOR
+
+void	PmergeMe::vector(const char **arg, int argc)
+{
+	for (int i = 0; i < argc; i++)
+		_vector[i] = ft_atoi(arg[i + 1]);
+}
+
+#pragma endregion
