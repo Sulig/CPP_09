@@ -100,8 +100,11 @@ void	PmergeMe::pmergeMe(const char **arg, int argc)
 
 void	PmergeMe::vector(const char **arg, int argc)
 {
+	// Parse
 	for (int i = 0; i < argc; i++)
-		_vector[i] = ft_atoi(arg[i + 1]);
+		_vect[i] = ft_atoi(arg[i + 1]);
+
+	// Separate into pairs
 }
 
 #pragma endregion

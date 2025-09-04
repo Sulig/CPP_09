@@ -26,6 +26,8 @@ class PmergeMe
 
 	protected:
 		int		ft_atoi(const std::string str);
+		//** */
+		void	vector(const char **arg, int argc);
 
 	public:
 		PmergeMe();
@@ -36,7 +38,7 @@ class PmergeMe
 		PmergeMe &operator=(const PmergeMe &other);
 		//** */
 
-		void	pmergeMe(const char **arg);
+		void	pmergeMe(const char **arg, int argc);
 		void	checkArg(const char **arg, int argc);
 };
 #endif
