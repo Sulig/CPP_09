@@ -6,13 +6,13 @@
 #    By: sadoming <sadoming@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/10 17:01:41 by sadoming          #+#    #+#              #
-#    Updated: 2025/09/03 20:12:02 by sadoming         ###   ########.fr        #
+#    Updated: 2025/09/10 16:06:54 by sadoming         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME	:=	PmergeMe
 
-INPUT	:=	"2 6 3 9 1 7"
+INPUT	:=	5 10 7 2 6 4 9 3 8
 # ------------------ #
 # Flags:
 
@@ -112,13 +112,9 @@ test: $(NAME)
 	@echo "  - None imput	->"
 	@./$(NAME)
 	@echo "   3 5 9 7 4	->"
-	@./$(NAME) "3 5 9 7 4"
-	@echo "   7 7 * 7 -	->"
-	@./$(NAME) "7 7 * 7 -"
-	@echo "   1 2 * 2 / 2 * 2 4 - +	->"
-	@./$(NAME)  "1 2 * 2 / 2 * 2 4 - +"
-	@echo "   (1 + 1)	->"
-	@./$(NAME) "(1 + 1)"
+	@./$(NAME) 3 5 9 7 4
+	@echo "2 6 3 9 1 7"
+	@./$(NAME) 2 6 3 9 1 7
 	@echo $(INPUT)
 	@./$(NAME) $(INPUT)
 	@echo "$(C) Thats all!! $(DEF)"

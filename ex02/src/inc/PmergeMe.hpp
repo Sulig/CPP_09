@@ -22,12 +22,26 @@
 class PmergeMe
 {
 	private:
-		std::vector<int>	_vect;
+		int		_compV;
+		//Vector -->
+		typedef struct	s_numV
+		{
+			size_t	value;
+			std::vector<size_t>	_group;
+		}				t_numV;
+		std::vector<t_numV>	_vect;
+		std::vector<t_numV>	_orgV;
+
+		// -->
 
 	protected:
 		int		ft_atoi(const std::string str);
 		//** */
-		void	vector(const char **arg, int argc);
+		void	printVector(std::vector<t_numV> vec, int all);
+		size_t	binarySearchV(std::vector<t_numV> vec, size_t num);
+		size_t	pairtoInsert(std::vector<t_numV> major, std::vector<t_numV> minor);
+		void	mergeInsertionV(std::vector<t_numV> sort);
+		//** */
 
 	public:
 		PmergeMe();
@@ -38,7 +52,7 @@ class PmergeMe
 		PmergeMe &operator=(const PmergeMe &other);
 		//** */
 
-		void	pmergeMe(const char **arg, int argc);
 		void	checkArg(const char **arg, int argc);
+		void	pmergeMe(const char **arg, int argc);
 };
 #endif
