@@ -6,7 +6,7 @@
 /*   By: sadoming <sadoming@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/28 18:47:46 by sadoming          #+#    #+#             */
-/*   Updated: 2025/09/16 14:06:04 by sadoming         ###   ########.fr       */
+/*   Updated: 2025/09/16 17:10:56 by sadoming         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,7 +156,7 @@ size_t	PmergeMe::binarySearchV(std::vector<t_numV> vec, size_t num)
 		if (num > vec[i].value && num < vec[i + 1].value)
 		{
 			_compV++;
-			return (i);
+			return (i + 1);
 		}
 		// Num is in half smaller ->
 		else if (num < vec[i].value)
@@ -208,17 +208,20 @@ std::vector<t_numV>	PmergeMe::popPositionV(std::vector<t_numV> org, size_t pos)
 	return (vect);
 }
 
-void	PmergeMe::pushPositionV(std::vector<t_numV> to_push, size_t pos)
+std::vector<t_numV>	PmergeMe::pushPositionV(std::vector<t_numV> org, t_numV to_push, size_t pos)
 {
 	std::vector<t_numV>	tmp;
-	for (size_t i = 0; i < _vect.size(); i++)
+	for (size_t i = 0; i < org.size(); i++)
 	{
 		if (i != pos)
-			tmp.push_back(_vect[i]);
+			tmp.push_back(org[i]);
 		else
+		{
 			tmp.push_back(to_push);
+			tmp.push_back(org[i]);
+		}
 	}
-	_vect = tmp;
+	return (tmp);
 }
 
 void	PmergeMe::mergeInsertionV(std::vector<t_numV> sort)
@@ -335,13 +338,17 @@ void	PmergeMe::mergeInsertionV(std::vector<t_numV> sort)
 			for (size_t j = temp.size() - 1; j >= 0; j--)
 			{
 				size_t	position = binarySearchV(_vect, temp[j].value);
-				std::cout << "Value = " << temp[j].value << " to insert in: " << position << std::endl;
-				//insertV(value, position);
+				std::cout << "Value = " << temp[j].value << " of group: " << i << " to insert in: " << position << std::endl;
+				_vect = pushPositionV(_vect, temp[j], position);
 				if (j == 0)
 					break ;
+				std::cout << std::endl << "Actual vector -->" << std::endl;
+				printVector(_vect, 0);
 			}
-			// insertV(temp[0].value, position);
 		}
+
+		std::cout << "Final vector:" << std::endl;
+		printVector(_vect, 1);
 	}
 }
 
