@@ -6,7 +6,7 @@
 /*   By: sadoming <sadoming@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/28 18:47:46 by sadoming          #+#    #+#             */
-/*   Updated: 2025/09/16 20:11:07 by sadoming         ###   ########.fr       */
+/*   Updated: 2025/09/16 20:56:40 by sadoming         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,7 +100,6 @@ void	PmergeMe::pmergeMe(const char **arg, int argc)
 	{
 		t_numV	temp;
 		temp.value = ft_atoi(arg[i]);
-		temp.index = i;
 		_vect.push_back(temp);
 	}
 
@@ -176,54 +175,49 @@ size_t	PmergeMe::nextJacobstal(size_t actual)
 
 size_t	PmergeMe::binarySearchV(std::vector<t_numV> vec, size_t num)
 {
-	size_t	i = vec.size() / 2 - 1;
+	size_t	left = 0;
+	size_t	right = vec.size() - 1;
 
-	while (i > 0 && i < vec.size())
+	// Num is the smaller one ->
+	if (num < vec[0].value)
 	{
-		// Num is the bigger one ->
-		if (num > vec.back().value)
+		_compV++;
+		return (0);
+	}
+	// Num is the bigger one ->
+	if (num > vec.back().value)
+	{
+		_compV++;
+		return (vec.size() - 1);
+	}
+	while (left <= right)
+	{
+		size_t	mid = (left + right) / 2;
+
+		if (num < vec[mid].value)
 		{
 			_compV++;
-			return (vec[vec.size() - 1].index);
+			left = mid + 1;
 		}
-		// Num is the smaller one ->
-		else if (num < vec[0].value)
+		if (num > vec[mid].value)
 		{
 			_compV++;
-			return (vec[0].index);
+			left = mid;
 		}
 		// In Middle (case 0 [1] 2 ...)
-		else if (num > vec[i].value && num < vec[i + 1].value)
+		else if (num > vec[left].value && num < vec[left + 1].value)
 		{
 			_compV++;
-			return (vec[i].index + 1);
+			return (left + 1);
 		}
 		// In Middle (case ... 3 [4] 5)
-		else if (num > vec[i - 1].value && num < vec[i].value)
+		else if (num > vec[left - 1].value && num < vec[left].value)
 		{
 			_compV++;
-			return (vec[i].index);
-		}
-		// Num is in half smaller ->
-		else if (num < vec[i].value)
-		{
-			_compV++;
-			std::vector<t_numV>	smaller;
-			for (size_t t = 0; t < vec.size() / 2 - 1; t++)
-				smaller.push_back(vec[t]);
-			binarySearchV(smaller, num);
-		}
-		// Num is in half bigger ->
-		else if (num > vec[i].value)
-		{
-			_compV++;
-			std::vector<t_numV>	bigger;
-			for (size_t t = vec.size() / 2 - 1; t < vec.size(); t++)
-				bigger.push_back(vec[t]);
-			binarySearchV(bigger, num);
+			return (left);
 		}
 	}
-	return (i);
+	return (left);
 }
 
 size_t	PmergeMe::pairtoInsert(std::vector<t_numV> major, std::vector<t_numV> minor)
@@ -239,13 +233,8 @@ std::vector<t_numV>	PmergeMe::popPositionV(std::vector<t_numV> org, size_t pos)
 {
 	std::vector<t_numV>	vect;
 	for (size_t i = 0; i < org.size(); i++)
-	{
 		if (i != pos)
-		{
 			vect.push_back(org[i]);
-			vect[i].index = i;
-		}
-	}
 	org.clear();
 	return (vect);
 }
@@ -267,7 +256,6 @@ std::vector<t_numV>	PmergeMe::pushPositionV(std::vector<t_numV> org, t_numV to_p
 			tmp.push_back(to_push);
 			tmp.push_back(org[i]);
 		}
-		tmp[i].index = i;
 	}
 	return (tmp);
 }
@@ -348,12 +336,21 @@ void	PmergeMe::mergeInsertionV(std::vector<t_numV> sort)
 	else
 		for (size_t i = 0; i < _vect.size(); i++)
 			sort.push_back(_vect[i]);
-	for (size_t m = 0; m < sort.size(); m++)
-		sort[m].index = m;
 	_vect = sort;
 	std::cout << "Sort vector ->" << std::endl;
 	printVector(_vect, 1);
 
+	// Insert the others elements
+	if (minor.size() == 1)
+	{
+		size_t	position = binarySearchV(_vect, minor[0].value);
+		_vect = pushPositionV(_vect, minor[0], position);
+		_vect[position]._group.pop_back();
+		std::cout << "minor" << std::endl;
+		printVector(_vect, 1);
+	}
+
+	// Last minor group ->
 	if (minor[0]._group.size() <= 1)
 	{
 		//--> Group the restant elements in groups, each one with size of respective Jacobstall serie x2
