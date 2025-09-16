@@ -19,18 +19,22 @@
 # include <string>
 # include <vector>
 
+typedef struct	s_numV
+{
+	size_t	value;
+	std::vector<size_t>	_group;
+}				t_numV;
+
 class PmergeMe
 {
 	private:
 		int		_compV;
 		//Vector -->
-		typedef struct	s_numV
-		{
-			size_t	value;
-			std::vector<size_t>	_group;
-		}				t_numV;
+
 		std::vector<t_numV>	_vect;
 		std::vector<t_numV>	_orgV;
+		std::vector<size_t>	_jacobstalV;
+		size_t				_actualJBV;
 
 		// -->
 
@@ -38,6 +42,9 @@ class PmergeMe
 		int		ft_atoi(const std::string str);
 		//** */
 		void	printVector(std::vector<t_numV> vec, int all);
+		std::vector<t_numV>	popPositionV(std::vector<t_numV> org, size_t pos);
+		void				pushPositionV(std::vector<t_numV> to_push, size_t pos);
+		size_t	nextJacobstal(size_t actual);
 		size_t	binarySearchV(std::vector<t_numV> vec, size_t num);
 		size_t	pairtoInsert(std::vector<t_numV> major, std::vector<t_numV> minor);
 		void	mergeInsertionV(std::vector<t_numV> sort);
