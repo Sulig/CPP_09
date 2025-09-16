@@ -6,7 +6,7 @@
 /*   By: sadoming <sadoming@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/28 18:47:46 by sadoming          #+#    #+#             */
-/*   Updated: 2025/09/16 17:36:54 by sadoming         ###   ########.fr       */
+/*   Updated: 2025/09/16 18:36:17 by sadoming         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -239,37 +239,37 @@ void	PmergeMe::mergeInsertionV(std::vector<t_numV> sort)
 	size_t	gr = 0;
 
 	// Separate into pairs
-	for (size_t i = 0; i < sort.size(); i++)
+	for (size_t v = 0; v < sort.size(); v++)
 	{
-		if (i + 1 >= sort.size())
-			minor.push_back(sort[i]);
+		if (v + 1 >= sort.size())
+			minor.push_back(sort[v]);
 		else
 		{
-			if (sort[i].value > sort[i + 1].value)
+			if (sort[v].value > sort[v + 1].value)
 			{
 				_compV++;
-				sort[i]._group.push_back(gr);
-				major.push_back(sort[i]);
-				if (i + 1 < sort.size())
+				sort[v]._group.push_back(gr);
+				major.push_back(sort[v]);
+				if (v + 1 < sort.size())
 				{
-					sort[i + 1]._group.push_back(gr);
-					minor.push_back(sort[i + 1]);
+					sort[v + 1]._group.push_back(gr);
+					minor.push_back(sort[v + 1]);
 				}
-				i++;
+				v++;
 				gr++;
 			}
-			else if (sort[i].value < sort[i + 1].value)
+			else if (sort[v].value < sort[v + 1].value)
 			{
 				_compV++;
-				sort[i]._group.push_back(gr);
-				if (i + 1 < sort.size())
+				sort[v]._group.push_back(gr);
+				if (v + 1 < sort.size())
 				{
-					sort[i + 1]._group.push_back(gr);
-					major.push_back(sort[i + 1]);
+					sort[v + 1]._group.push_back(gr);
+					major.push_back(sort[v + 1]);
 				}
-				minor.push_back(sort[i]);
+				minor.push_back(sort[v]);
 				gr++;
-				i++;
+				v++;
 			}
 		}
 	}
@@ -315,17 +315,17 @@ void	PmergeMe::mergeInsertionV(std::vector<t_numV> sort)
 		//--> Group the restant elements in groups, each one with size of respective Jacobstall serie x2
 		std::vector<std::vector<t_numV> >	groups;
 
-		size_t	i = 0;
-		while (i < minor.size())
+		size_t	e = 0;
+		while (e < minor.size())
 		{
 			std::cout << "-- Group size JB --> " << _jacobstalV[_actualJBV] << std::endl;
 			std::vector<t_numV>	temp;
 			for (size_t j = 0; j < _jacobstalV[_actualJBV]; j++)
 			{
-				if (i >= minor.size())
+				if (e >= minor.size())
 					break ;
-				temp.push_back(minor[i]);
-				i++;
+				temp.push_back(minor[e]);
+				e++;
 			}
 			std::cout << "- Temp -->" << std::endl;
 			printVector(temp, 1);
@@ -341,16 +341,19 @@ void	PmergeMe::mergeInsertionV(std::vector<t_numV> sort)
 		for (size_t i = 0; i < groups.size(); i++)
 		{
 			std::vector<t_numV>	temp = groups[i];
-			for (size_t j = temp.size() - 1; j >= 0; j--)
+			size_t	j = temp.size() - 1;
+			while (j < temp.size())
 			{
+				std::cout << "Value = " << temp[j].value << " of group: " << i;
 				size_t	position = binarySearchV(_vect, temp[j].value);
-				std::cout << "Value = " << temp[j].value << " of group: " << i << " to insert in: " << position << std::endl;
+				std::cout << " to insert in: " << position << std::endl;
 				_vect = pushPositionV(_vect, temp[j], position);
 				if (j == 0)
 					break ;
-				std::cout << std::endl << "Actual vector -->" << std::endl;
-				printVector(_vect, 0);
+				j--;
 			}
+			std::cout << std::endl << "Actual vector -->" << std::endl;
+			printVector(_vect, 0);
 		}
 
 		std::cout << "Final vector:" << std::endl;
