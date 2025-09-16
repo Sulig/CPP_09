@@ -6,7 +6,7 @@
 /*   By: sadoming <sadoming@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/28 18:47:46 by sadoming          #+#    #+#             */
-/*   Updated: 2025/09/16 17:10:56 by sadoming         ###   ########.fr       */
+/*   Updated: 2025/09/16 17:36:54 by sadoming         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -152,8 +152,14 @@ size_t	PmergeMe::binarySearchV(std::vector<t_numV> vec, size_t num)
 
 	while (i > 0 && i < vec.size())
 	{
+		// Num is the bigger one ->
+		if (num > vec.back().value)
+		{
+			_compV++;
+			return (vec.size() - 1);
+		}
 		// In Middle
-		if (num > vec[i].value && num < vec[i + 1].value)
+		else if (num > vec[i].value && num < vec[i + 1].value)
 		{
 			_compV++;
 			return (i + 1);
