@@ -19,6 +19,8 @@
 # include <string>
 # include <vector>
 
+# define SHOW_COUNTER	1
+
 typedef struct	s_numV
 {
 	size_t	value;

@@ -6,7 +6,7 @@
 /*   By: sadoming <sadoming@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/28 18:47:46 by sadoming          #+#    #+#             */
-/*   Updated: 2025/09/16 18:36:17 by sadoming         ###   ########.fr       */
+/*   Updated: 2025/09/16 19:48:39 by sadoming         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,6 +94,7 @@ void	PmergeMe::checkArg(const char **arg, int argc)
 void	PmergeMe::pmergeMe(const char **arg, int argc)
 {
 	//crono
+	size_t timeV = 0;
 	// Parse
 	for (int i = 1; i < argc; i++)
 	{
@@ -102,15 +103,41 @@ void	PmergeMe::pmergeMe(const char **arg, int argc)
 		_vect.push_back(temp);
 	}
 
-	std::cout << "Original Vector stack: ->" << std::endl;
-	printVector(_vect, 0);
+	for (size_t t = 0; t < _vect.size(); t++)
+	{
+		for (size_t v = t + 1; v < _vect.size(); v++)
+		{
+			if (_vect[t].value == _vect[v].value)
+			{
+				std::cout << "Error: Can't accept duplicates!" << std::endl;
+				return ;
+			}
+		}
+	}
 	_orgV = _vect;
 	mergeInsertionV(_vect);
 	//stop crono
 
 	//crono 2
+	size_t timeL = 0;
 	//ccall //
 	//stop crono 2
+
+	std::cout << "Before: \t";
+	for (size_t i = 0; i < _orgV.size(); i++)
+		std::cout << _orgV[i].value << " ";
+	std::cout << std::endl;
+
+	std::cout << "After: \t\t";
+	for (size_t i = 0; i < _vect.size(); i++)
+		std::cout << _vect[i].value << " ";
+	std::cout << std::endl;
+
+	if (SHOW_COUNTER)
+		std::cout << "Comparations used (for vector): " << _compV << std::endl;
+
+	std::cout << "Time to process a range of 3000 elements with std::vector: \t" << timeV << std::endl;
+	std::cout << "Time to process a range of 3000 elements with std::list: \t" << timeL << std::endl;
 }
 /* ----- */
 
@@ -158,11 +185,17 @@ size_t	PmergeMe::binarySearchV(std::vector<t_numV> vec, size_t num)
 			_compV++;
 			return (vec.size() - 1);
 		}
-		// In Middle
+		// In Middle (case 0 [1] 2 ...)
 		else if (num > vec[i].value && num < vec[i + 1].value)
 		{
 			_compV++;
 			return (i + 1);
+		}
+		// In Middle (case ... 3 [4] 5)
+		else if (num > vec[i - 1].value && num < vec[i].value)
+		{
+			_compV++;
+			return (i);
 		}
 		// Num is in half smaller ->
 		else if (num < vec[i].value)
@@ -221,6 +254,11 @@ std::vector<t_numV>	PmergeMe::pushPositionV(std::vector<t_numV> org, t_numV to_p
 	{
 		if (i != pos)
 			tmp.push_back(org[i]);
+		else if (pos == org.size() - 1)
+		{
+			tmp.push_back(org[i]);
+			tmp.push_back(to_push);
+		}
 		else
 		{
 			tmp.push_back(to_push);
@@ -344,12 +382,14 @@ void	PmergeMe::mergeInsertionV(std::vector<t_numV> sort)
 			size_t	j = temp.size() - 1;
 			while (j < temp.size())
 			{
-				std::cout << "Value = " << temp[j].value << " of group: " << i;
+				std::cout << "Value = " << temp[j].value << " of group: " << i << std::endl;
 				size_t	position = binarySearchV(_vect, temp[j].value);
-				std::cout << " to insert in: " << position << std::endl;
+				std::cout << "Insert in: " << position << std::endl;
 				_vect = pushPositionV(_vect, temp[j], position);
 				if (j == 0)
 					break ;
+				std::cout << std::endl << "Actual vector -->" << std::endl;
+				printVector(_vect, 0);
 				j--;
 			}
 			std::cout << std::endl << "Actual vector -->" << std::endl;
@@ -357,7 +397,7 @@ void	PmergeMe::mergeInsertionV(std::vector<t_numV> sort)
 		}
 
 		std::cout << "Final vector:" << std::endl;
-		printVector(_vect, 1);
+		printVector(_vect, 0);
 	}
 }
 
