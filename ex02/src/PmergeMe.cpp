@@ -6,7 +6,7 @@
 /*   By: sadoming <sadoming@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/28 18:47:46 by sadoming          #+#    #+#             */
-/*   Updated: 2025/09/16 19:48:39 by sadoming         ###   ########.fr       */
+/*   Updated: 2025/09/16 20:11:07 by sadoming         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,6 +100,7 @@ void	PmergeMe::pmergeMe(const char **arg, int argc)
 	{
 		t_numV	temp;
 		temp.value = ft_atoi(arg[i]);
+		temp.index = i;
 		_vect.push_back(temp);
 	}
 
@@ -183,48 +184,45 @@ size_t	PmergeMe::binarySearchV(std::vector<t_numV> vec, size_t num)
 		if (num > vec.back().value)
 		{
 			_compV++;
-			return (vec.size() - 1);
+			return (vec[vec.size() - 1].index);
+		}
+		// Num is the smaller one ->
+		else if (num < vec[0].value)
+		{
+			_compV++;
+			return (vec[0].index);
 		}
 		// In Middle (case 0 [1] 2 ...)
 		else if (num > vec[i].value && num < vec[i + 1].value)
 		{
 			_compV++;
-			return (i + 1);
+			return (vec[i].index + 1);
 		}
 		// In Middle (case ... 3 [4] 5)
 		else if (num > vec[i - 1].value && num < vec[i].value)
 		{
 			_compV++;
-			return (i);
+			return (vec[i].index);
 		}
 		// Num is in half smaller ->
 		else if (num < vec[i].value)
 		{
 			_compV++;
-			if (i == 0 || i == 1)
-			{
-				if (num < vec[0].value)
-				{
-					_compV++;
-					return (0);
-				}
-				if (num < vec[1].value)
-				{
-					_compV++;
-					return (1);
-				}
-			}
-			i /= 2;
+			std::vector<t_numV>	smaller;
+			for (size_t t = 0; t < vec.size() / 2 - 1; t++)
+				smaller.push_back(vec[t]);
+			binarySearchV(smaller, num);
 		}
 		// Num is in half bigger ->
 		else if (num > vec[i].value)
 		{
 			_compV++;
-			i *= 2;
+			std::vector<t_numV>	bigger;
+			for (size_t t = vec.size() / 2 - 1; t < vec.size(); t++)
+				bigger.push_back(vec[t]);
+			binarySearchV(bigger, num);
 		}
 	}
-	if (i > vec.size())
-		return (vec.size() - 1);
 	return (i);
 }
 
@@ -241,8 +239,13 @@ std::vector<t_numV>	PmergeMe::popPositionV(std::vector<t_numV> org, size_t pos)
 {
 	std::vector<t_numV>	vect;
 	for (size_t i = 0; i < org.size(); i++)
+	{
 		if (i != pos)
+		{
 			vect.push_back(org[i]);
+			vect[i].index = i;
+		}
+	}
 	org.clear();
 	return (vect);
 }
@@ -264,6 +267,7 @@ std::vector<t_numV>	PmergeMe::pushPositionV(std::vector<t_numV> org, t_numV to_p
 			tmp.push_back(to_push);
 			tmp.push_back(org[i]);
 		}
+		tmp[i].index = i;
 	}
 	return (tmp);
 }
@@ -344,6 +348,8 @@ void	PmergeMe::mergeInsertionV(std::vector<t_numV> sort)
 	else
 		for (size_t i = 0; i < _vect.size(); i++)
 			sort.push_back(_vect[i]);
+	for (size_t m = 0; m < sort.size(); m++)
+		sort[m].index = m;
 	_vect = sort;
 	std::cout << "Sort vector ->" << std::endl;
 	printVector(_vect, 1);

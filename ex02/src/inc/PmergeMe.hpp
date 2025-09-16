@@ -24,6 +24,7 @@
 typedef struct	s_numV
 {
 	size_t	value;
+	size_t	index;
 	std::vector<size_t>	_group;
 }				t_numV;
 
