@@ -45,9 +45,10 @@ class PmergeMe
 		int		ft_atoi(const std::string str);
 		//** */
 		void	printVector(std::vector<t_numV> vec, int all);
+		bool	checkifSortedV(std::vector<t_numV> vec);
 		std::vector<t_numV>	popPositionV(std::vector<t_numV> org, size_t pos);
 		std::vector<t_numV>	pushPositionV(std::vector<t_numV> org, t_numV to_push, size_t pos);
-		size_t	nextJacobstal(size_t actual);
+		size_t	nextJacobstalVDouble(size_t actual);
 		size_t	binarySearchV(std::vector<t_numV> vec, size_t num);
 		size_t	pairtoInsert(std::vector<t_numV> major, std::vector<t_numV> minor);
 		void	mergeInsertionV(std::vector<t_numV> sort);

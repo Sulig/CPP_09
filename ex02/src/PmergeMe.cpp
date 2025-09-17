@@ -6,7 +6,7 @@
 /*   By: sadoming <sadoming@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/28 18:47:46 by sadoming          #+#    #+#             */
-/*   Updated: 2025/09/17 15:59:08 by sadoming         ###   ########.fr       */
+/*   Updated: 2025/09/17 17:50:43 by sadoming         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,14 +18,14 @@ PmergeMe::PmergeMe()
 	_compV = 0;
 	_actualJBV = 0;
 	_group_size = 0;
-	nextJacobstal(_actualJBV);
+	nextJacobstalVDouble(_actualJBV);
 }
 PmergeMe::PmergeMe(const char **arg, int argc)
 {
 	_compV = 0;
 	_actualJBV = 0;
 	_group_size = 0;
-	nextJacobstal(_actualJBV);
+	nextJacobstalVDouble(_actualJBV);
 	checkArg(arg, argc);
 	pmergeMe(arg, argc);
 }
@@ -140,6 +140,13 @@ void	PmergeMe::pmergeMe(const char **arg, int argc)
 
 	std::cout << "Time to process a range of " << _orgV.size() << " elements with std::vector: \t" << timeV << std::endl;
 	std::cout << "Time to process a range of 3000 elements with std::list: \t" << timeL << std::endl;
+
+	std::cout << "Is <vector> sorted?\t::\t";
+	if (checkifSortedV(_vect))
+		std::cout << "\033[0;32m" << "YES" << std::endl;
+	else
+		std::cout << "\033[0;31m" << "NOOO!!" << std::endl;
+	std::cout << "\033[0m" << std::endl;
 }
 /* ----- */
 
@@ -162,7 +169,16 @@ void	PmergeMe::printVector(std::vector<t_numV> vec, int all)
 	std::cout << std::endl;
 }
 
-size_t	PmergeMe::nextJacobstal(size_t actual)
+bool	PmergeMe::checkifSortedV(std::vector<t_numV> vec)
+{
+	for (size_t t = 0; t < vec.size(); t++)
+		for (size_t v = t + 1; v < vec.size(); v++)
+			if (vec[t].value > vec[v].value)
+				return (0);
+	return (1);
+}
+
+size_t	PmergeMe::nextJacobstalVDouble(size_t actual)
 {
 	if (_jacobstalV.size() == 0)
 	{
@@ -171,7 +187,12 @@ size_t	PmergeMe::nextJacobstal(size_t actual)
 		_jacobstalV.push_back(6);
 	}
 	if (actual >= _jacobstalV.size())
-		_jacobstalV.push_back((_jacobstalV.back() / 2 + 2 * _jacobstalV[_jacobstalV.back() - 1]) * 2);
+	{
+		size_t	n = _jacobstalV.size();
+		size_t	next = _jacobstalV[n - 1] + 2 * _jacobstalV[n - 2];
+		next *= 2;
+		_jacobstalV.push_back(next);
+	}
 	return (actual);
 }
 
@@ -193,20 +214,26 @@ size_t	PmergeMe::binarySearchV(std::vector<t_numV> vec, size_t num)
 		_compV++;
 		return (vec.size());
 	}
-	while (left <= right)
+	while (left < right)
 	{
 		mid = (left + right) / 2;
 		// In Middle (case 0 [1] 2 ...)
-		if (num > vec[mid].value && num < vec[mid + 1].value)
+		if (!(mid + 1 > vec.size()))
 		{
-			_compV++;
-			return (mid + 1);
+			if (num > vec[mid].value && num < vec[mid + 1].value)
+			{
+				_compV++;
+				return (mid + 1);
+			}
 		}
 		// In Middle (case ... 3 [4] 5)
-		if (num > vec[mid - 1].value && num < vec[mid].value)
+		if (!(mid - 1 < 0))
 		{
-			_compV++;
-			return (mid);
+			if (num > vec[mid - 1].value && num < vec[mid].value)
+			{
+				_compV++;
+				return (mid);
+			}
 		}
 		if (num > vec[mid].value)
 		{
@@ -219,15 +246,21 @@ size_t	PmergeMe::binarySearchV(std::vector<t_numV> vec, size_t num)
 			right = mid;
 		}
 	}
-	return (left);
+	return (mid);
 }
 
 size_t	PmergeMe::pairtoInsert(std::vector<t_numV> major, std::vector<t_numV> minor)
 {
 	size_t to_insert = 0;
+	if (major.empty() || minor.empty())
+		return (0);
+	size_t	group_id = 0;
+	if (major.size())
+		group_id = major[0]._group.back();
 	for (to_insert = 0; to_insert < minor.size(); to_insert++)
-		if (minor[to_insert]._group[minor[to_insert]._group.size() - 1] == major[0]._group[major[0]._group.size() - 1])
-			return (to_insert);
+		if (!minor[to_insert]._group.empty())
+			if (minor[to_insert]._group.back() == group_id)
+				return (to_insert);
 	return (to_insert);
 }
 
@@ -351,7 +384,7 @@ void	PmergeMe::mergeInsertionV(std::vector<t_numV> sort)
 			}
 			groups.push_back(temp);
 			//Get next Jacobstal number
-			_actualJBV = nextJacobstal(++_actualJBV);
+			_actualJBV = nextJacobstalVDouble(++_actualJBV);
 		}
 		//--> In groups (n1, n2, etc..), insert first the larger index
 		/*	Group 1 & 2-> Insert first [1], later [0]
