@@ -33,8 +33,9 @@ class PmergeMe
 		int		_compV;
 		//Vector -->
 
-		std::vector<t_numV>	_vect;
+		size_t	_group_size;
 		std::vector<t_numV>	_orgV;
+		std::vector<t_numV>	_vect;
 		std::vector<size_t>	_jacobstalV;
 		size_t				_actualJBV;
 

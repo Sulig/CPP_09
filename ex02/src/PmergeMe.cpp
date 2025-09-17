@@ -6,7 +6,7 @@
 /*   By: sadoming <sadoming@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/28 18:47:46 by sadoming          #+#    #+#             */
-/*   Updated: 2025/09/16 20:56:40 by sadoming         ###   ########.fr       */
+/*   Updated: 2025/09/17 15:59:08 by sadoming         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,12 +17,14 @@ PmergeMe::PmergeMe()
 {
 	_compV = 0;
 	_actualJBV = 0;
+	_group_size = 0;
 	nextJacobstal(_actualJBV);
 }
 PmergeMe::PmergeMe(const char **arg, int argc)
 {
 	_compV = 0;
 	_actualJBV = 0;
+	_group_size = 0;
 	nextJacobstal(_actualJBV);
 	checkArg(arg, argc);
 	pmergeMe(arg, argc);
@@ -136,7 +138,7 @@ void	PmergeMe::pmergeMe(const char **arg, int argc)
 	if (SHOW_COUNTER)
 		std::cout << "Comparations used (for vector): " << _compV << std::endl;
 
-	std::cout << "Time to process a range of 3000 elements with std::vector: \t" << timeV << std::endl;
+	std::cout << "Time to process a range of " << _orgV.size() << " elements with std::vector: \t" << timeV << std::endl;
 	std::cout << "Time to process a range of 3000 elements with std::list: \t" << timeL << std::endl;
 }
 /* ----- */
@@ -176,7 +178,8 @@ size_t	PmergeMe::nextJacobstal(size_t actual)
 size_t	PmergeMe::binarySearchV(std::vector<t_numV> vec, size_t num)
 {
 	size_t	left = 0;
-	size_t	right = vec.size() - 1;
+	size_t	right = vec.size();
+	size_t	mid = (left + right) / 2;
 
 	// Num is the smaller one ->
 	if (num < vec[0].value)
@@ -188,33 +191,32 @@ size_t	PmergeMe::binarySearchV(std::vector<t_numV> vec, size_t num)
 	if (num > vec.back().value)
 	{
 		_compV++;
-		return (vec.size() - 1);
+		return (vec.size());
 	}
 	while (left <= right)
 	{
-		size_t	mid = (left + right) / 2;
-
-		if (num < vec[mid].value)
+		mid = (left + right) / 2;
+		// In Middle (case 0 [1] 2 ...)
+		if (num > vec[mid].value && num < vec[mid + 1].value)
 		{
 			_compV++;
-			left = mid + 1;
+			return (mid + 1);
+		}
+		// In Middle (case ... 3 [4] 5)
+		if (num > vec[mid - 1].value && num < vec[mid].value)
+		{
+			_compV++;
+			return (mid);
 		}
 		if (num > vec[mid].value)
 		{
 			_compV++;
 			left = mid;
 		}
-		// In Middle (case 0 [1] 2 ...)
-		else if (num > vec[left].value && num < vec[left + 1].value)
+		if (num < vec[mid].value)
 		{
 			_compV++;
-			return (left + 1);
-		}
-		// In Middle (case ... 3 [4] 5)
-		else if (num > vec[left - 1].value && num < vec[left].value)
-		{
-			_compV++;
-			return (left);
+			right = mid;
 		}
 	}
 	return (left);
@@ -242,15 +244,15 @@ std::vector<t_numV>	PmergeMe::popPositionV(std::vector<t_numV> org, size_t pos)
 std::vector<t_numV>	PmergeMe::pushPositionV(std::vector<t_numV> org, t_numV to_push, size_t pos)
 {
 	std::vector<t_numV>	tmp;
+	if (pos >= org.size())
+	{
+		org.push_back(to_push);
+		return (org);
+	}
 	for (size_t i = 0; i < org.size(); i++)
 	{
 		if (i != pos)
 			tmp.push_back(org[i]);
-		else if (pos == org.size() - 1)
-		{
-			tmp.push_back(org[i]);
-			tmp.push_back(to_push);
-		}
 		else
 		{
 			tmp.push_back(to_push);
@@ -267,6 +269,7 @@ void	PmergeMe::mergeInsertionV(std::vector<t_numV> sort)
 
 	std::vector<t_numV>	major, minor;
 	size_t	gr = 0;
+	_group_size++;
 
 	// Separate into pairs
 	for (size_t v = 0; v < sort.size(); v++)
@@ -303,18 +306,9 @@ void	PmergeMe::mergeInsertionV(std::vector<t_numV> sort)
 			}
 		}
 	}
-
-	std::cout << "Major stack: ->" << std::endl;
-	printVector(major, 1);
-	std::cout << "Minor stack: ->" << std::endl;
-	printVector(minor, 1);
-
 	// Keep separating the major stack until only have 1 element ->
 	mergeInsertionV(major);
-
-	std::cout << "AFTER RECURSION -->" << std::endl;
-	std::cout << "Minor stack: ->" << std::endl;
-	printVector(minor, 1);
+	_group_size--;
 
 	//* Insertion ->
 	//--> Look for minor number's pair in major stack
@@ -326,8 +320,6 @@ void	PmergeMe::mergeInsertionV(std::vector<t_numV> sort)
 
 	sort.clear();
 	sort.push_back(minor[to_insert]);
-	if (sort.back()._group.size())
-		sort.back()._group.pop_back();
 	// Remember to remove the inserted element in minor stack!
 	minor = popPositionV(minor, to_insert);
 	if (major.size() == 1)
@@ -337,29 +329,18 @@ void	PmergeMe::mergeInsertionV(std::vector<t_numV> sort)
 		for (size_t i = 0; i < _vect.size(); i++)
 			sort.push_back(_vect[i]);
 	_vect = sort;
-	std::cout << "Sort vector ->" << std::endl;
-	printVector(_vect, 1);
+	major.clear();
 
-	// Insert the others elements
-	if (minor.size() == 1)
-	{
-		size_t	position = binarySearchV(_vect, minor[0].value);
-		_vect = pushPositionV(_vect, minor[0], position);
-		_vect[position]._group.pop_back();
-		std::cout << "minor" << std::endl;
-		printVector(_vect, 1);
-	}
-
-	// Last minor group ->
-	if (minor[0]._group.size() <= 1)
+	// Insert the restant elements in minor vect ->
+	if (minor.size())
 	{
 		//--> Group the restant elements in groups, each one with size of respective Jacobstall serie x2
 		std::vector<std::vector<t_numV> >	groups;
 
 		size_t	e = 0;
+		_actualJBV = 0;
 		while (e < minor.size())
 		{
-			std::cout << "-- Group size JB --> " << _jacobstalV[_actualJBV] << std::endl;
 			std::vector<t_numV>	temp;
 			for (size_t j = 0; j < _jacobstalV[_actualJBV]; j++)
 			{
@@ -368,8 +349,6 @@ void	PmergeMe::mergeInsertionV(std::vector<t_numV> sort)
 				temp.push_back(minor[e]);
 				e++;
 			}
-			std::cout << "- Temp -->" << std::endl;
-			printVector(temp, 1);
 			groups.push_back(temp);
 			//Get next Jacobstal number
 			_actualJBV = nextJacobstal(++_actualJBV);
@@ -385,23 +364,18 @@ void	PmergeMe::mergeInsertionV(std::vector<t_numV> sort)
 			size_t	j = temp.size() - 1;
 			while (j < temp.size())
 			{
-				std::cout << "Value = " << temp[j].value << " of group: " << i << std::endl;
-				size_t	position = binarySearchV(_vect, temp[j].value);
-				std::cout << "Insert in: " << position << std::endl;
-				_vect = pushPositionV(_vect, temp[j], position);
+				to_insert = binarySearchV(_vect, temp[j].value);
+				_vect = pushPositionV(_vect, temp[j], to_insert);
 				if (j == 0)
 					break ;
-				std::cout << std::endl << "Actual vector -->" << std::endl;
-				printVector(_vect, 0);
 				j--;
 			}
-			std::cout << std::endl << "Actual vector -->" << std::endl;
-			printVector(_vect, 0);
 		}
-
-		std::cout << "Final vector:" << std::endl;
-		printVector(_vect, 0);
 	}
-}
 
+	//Asegurate all numbers have the same group_size
+	for (size_t i = 0; i < _vect.size(); i++)
+		while (_vect[i]._group.size() > _group_size)
+			_vect[i]._group.pop_back();
+}
 #pragma endregion

@@ -6,18 +6,19 @@
 #    By: sadoming <sadoming@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/10 17:01:41 by sadoming          #+#    #+#              #
-#    Updated: 2025/09/16 20:06:57 by sadoming         ###   ########.fr        #
+#    Updated: 2025/09/17 16:10:02 by sadoming         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME	:=	PmergeMe
 
-INPUT	:=	3 8 1 0 2 5 7 4 9
+# 427
+INPUT	:=	`shuf -i 1-100000 -n 427 | tr "\n" " "`
 # ------------------ #
 # Flags:
 
 CC		:= c++
-CFLAGS	:= -Wall -Wextra -Werror -std=c++98 -g -c #-fsanitize=address
+CFLAGS	:= -Wall -Wextra -Werror -std=c++98 -g -c
 # ------------------- #
 # Colors
 
@@ -115,6 +116,8 @@ test: $(NAME)
 	@./$(NAME) 3 5 9 7 4
 	@echo "2 6 3 9 1 7"
 	@./$(NAME) 2 6 3 9 1 7
+	@echo "3 8 1 0 2 5 7 4 9"
+	@./$(NAME) 3 8 1 0 2 5 7 4 9
 	@echo "5 10 7 2 6 4 9 3 8"
 	@./$(NAME) 5 10 7 2 6 4 9 3 8
 	@echo "3 8 1 10 2 5 7 4 9 0 12"
