@@ -6,7 +6,7 @@
 /*   By: sadoming <sadoming@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/28 18:47:46 by sadoming          #+#    #+#             */
-/*   Updated: 2025/09/17 19:40:39 by sadoming         ###   ########.fr       */
+/*   Updated: 2025/09/17 19:52:49 by sadoming         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -199,6 +199,7 @@ void	PmergeMe::pmergeMe(const char **arg, int argc)
 		}
 	}
 	_orgL = _list;
+	mergeInsertionL(_list);
 	//stop crono 2
 
 	std::cout << "Before: \t";
@@ -212,24 +213,30 @@ void	PmergeMe::pmergeMe(const char **arg, int argc)
 	std::cout << std::endl;
 
 	if (SHOW_COUNTER)
-		std::cout << "Comparations used (for vector): " << _compV << std::endl;
+	{
+		std::cout << "Comparations used (for vector): \t" << _compV << std::endl;
+		std::cout << "Comparations used (for list): \t\t" << _compL << std::endl;
+	}
 
 	std::cout << "Time to process a range of " << _orgV.size() << " elements with std::vector: \t" << timeV << std::endl;
-	std::cout << "Time to process a range of " << _orgL.size() << " elements with std::list: \t\t" << timeL << std::endl;
+	std::cout << "Time to process a range of " << _orgL.size() << " elements with std::list: \t" << timeL << std::endl;
 
-	std::cout << "Is <vector> sorted?\t::\t";
-	if (checkifSortedV(_vect))
-		std::cout << "\033[0;32m" << "YES" << std::endl;
-	else
-		std::cout << "\033[0;31m" << "NOOO!!" << std::endl;
-	std::cout << "\033[0m" << std::endl;
+	if (SHOW_SORT)
+	{
+		std::cout << "Is <vector> sorted?\t::\t";
+		if (checkifSortedV(_vect))
+			std::cout << "\033[0;32m" << "YES" << std::endl;
+		else
+			std::cout << "\033[0;31m" << "NOOO!!" << std::endl;
+		std::cout << "\033[0m" << std::endl;
 
-	std::cout << "Is <list> sorted?\t::\t";
-	if (checkifSortedL(_list))
-		std::cout << "\033[0;32m" << "YES" << std::endl;
-	else
-		std::cout << "\033[0;31m" << "NOOO!!" << std::endl;
-	std::cout << "\033[0m" << std::endl;
+		std::cout << "Is <list> sorted?\t::\t";
+		if (checkifSortedL(_list))
+			std::cout << "\033[0;32m" << "YES" << std::endl;
+		else
+			std::cout << "\033[0;31m" << "NOOO!!" << std::endl;
+		std::cout << "\033[0m" << std::endl;
+	}
 }
 /* ----- */
 

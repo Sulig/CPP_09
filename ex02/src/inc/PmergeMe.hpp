@@ -23,6 +23,7 @@
 # include <vector>
 
 # define SHOW_COUNTER	1
+# define SHOW_SORT		1
 
 typedef struct	s_numV
 {
@@ -84,8 +85,6 @@ class PmergeMe
 		template <typename T>
 		typename std::list<T>::reference	list_at(std::list<T>& lst, size_t idx)
 		{
-			if (idx >= lst.size())
-				throw std::out_of_range("Index is out of range for list!");
 			typename std::list<T>::iterator it = lst.begin();
 			for (size_t i = 0; i < lst.size(); i++)
 			{
