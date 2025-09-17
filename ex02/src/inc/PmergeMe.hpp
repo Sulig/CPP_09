@@ -13,6 +13,7 @@
 #ifndef PMERGEME_HPP
 # define PMERGEME_HPP
 
+# include <sys/time.h>
 # include <iostream>
 # include <cstdlib>
 # include <sstream>

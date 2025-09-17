@@ -6,7 +6,7 @@
 /*   By: sadoming <sadoming@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/28 18:47:46 by sadoming          #+#    #+#             */
-/*   Updated: 2025/09/17 19:52:49 by sadoming         ###   ########.fr       */
+/*   Updated: 2025/09/17 20:11:48 by sadoming         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,6 +102,13 @@ PmergeMe &PmergeMe::operator=(const PmergeMe &other)
 /* ----- */
 
 /* Utils	*/
+static long long getMicroseconds()
+{
+	struct timeval tv;
+	gettimeofday(&tv, NULL);
+	return (long long)tv.tv_sec * 1000000 + tv.tv_usec;
+}
+
 int	PmergeMe::ft_atoi(const std::string str)
 {
 	int		cnt;
@@ -152,8 +159,8 @@ void	PmergeMe::checkArg(const char **arg, int argc)
 /*	PmergeMe	*/
 void	PmergeMe::pmergeMe(const char **arg, int argc)
 {
-	//crono
-	size_t timeV = 0;
+	long long	startV = getMicroseconds();
+
 	// Parse
 	for (int i = 1; i < argc; i++)
 	{
@@ -175,10 +182,9 @@ void	PmergeMe::pmergeMe(const char **arg, int argc)
 	}
 	_orgV = _vect;
 	mergeInsertionV(_vect);
-	//stop crono
+	long long endV = getMicroseconds();
 
-	//crono 2
-	size_t timeL = 0;
+	long long startL = getMicroseconds();
 	// Parse
 	for (int i = 1; i < argc; i++)
 	{
@@ -200,7 +206,7 @@ void	PmergeMe::pmergeMe(const char **arg, int argc)
 	}
 	_orgL = _list;
 	mergeInsertionL(_list);
-	//stop crono 2
+	long long endL = getMicroseconds();
 
 	std::cout << "Before: \t";
 	for (size_t i = 0; i < _orgV.size(); i++)
@@ -218,8 +224,11 @@ void	PmergeMe::pmergeMe(const char **arg, int argc)
 		std::cout << "Comparations used (for list): \t\t" << _compL << std::endl;
 	}
 
-	std::cout << "Time to process a range of " << _orgV.size() << " elements with std::vector: \t" << timeV << std::endl;
-	std::cout << "Time to process a range of " << _orgL.size() << " elements with std::list: \t" << timeL << std::endl;
+	double timeV = (double)(endV - startV);
+	double timeL = (double)(endL - startL);
+
+	std::cout << "Time to process a range of " << _orgV.size() << " elements with std::vector: \t" << timeV << " ms" << std::endl;
+	std::cout << "Time to process a range of " << _orgL.size() << " elements with std::list: \t" << timeL << " ms" << std::endl;
 
 	if (SHOW_SORT)
 	{
