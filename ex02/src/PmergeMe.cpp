@@ -6,7 +6,7 @@
 /*   By: sadoming <sadoming@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/28 18:47:46 by sadoming          #+#    #+#             */
-/*   Updated: 2025/09/17 17:50:43 by sadoming         ###   ########.fr       */
+/*   Updated: 2025/09/17 19:40:39 by sadoming         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,22 +15,67 @@
 /* Constructor & destructor */
 PmergeMe::PmergeMe()
 {
+	_group_size = 0;
+
+	//* Vector start
 	_compV = 0;
 	_actualJBV = 0;
-	_group_size = 0;
 	nextJacobstalVDouble(_actualJBV);
+
+	//* List start
+	_compL = 0;
+	_actualJBL = 0;
+	//nextJacobstalVDouble(_actualJBV);
 }
 PmergeMe::PmergeMe(const char **arg, int argc)
 {
+	_group_size = 0;
+
+	//* Vector start
 	_compV = 0;
 	_actualJBV = 0;
-	_group_size = 0;
 	nextJacobstalVDouble(_actualJBV);
+
+	//* List start
+	_compL = 0;
+	_actualJBL = 0;
+	//nextJacobstalVDouble(_actualJBV);
+
 	checkArg(arg, argc);
 	pmergeMe(arg, argc);
 }
-PmergeMe::PmergeMe(const PmergeMe &other) : _vect(other._vect) {}
-PmergeMe::~PmergeMe() { }
+PmergeMe::PmergeMe(const PmergeMe &other)
+{
+	_group_size = other._group_size;
+
+	_compL = other._compL;
+	_orgL = other._orgL;
+	_list = other._list;
+	_jacobstalL = other._jacobstalL;
+	_actualJBL = other._actualJBL;
+
+	_compV = other._compV;
+	_orgV = other._orgV;
+	_vect = other._vect;
+	_jacobstalV = other._jacobstalV;
+	_actualJBV = other._actualJBV;
+}
+PmergeMe::~PmergeMe()
+{
+	_group_size = 0;
+
+	_compL = 0;
+	_orgL.clear();
+	_list.clear();
+	_jacobstalL.clear();
+	_actualJBL = 0;
+
+	_compV = 0;
+	_orgV.clear();
+	_vect.clear();
+	_jacobstalV.clear();
+	_actualJBV = 0;
+}
 /* ----- */
 
 /* Operator overloads */
@@ -38,7 +83,19 @@ PmergeMe &PmergeMe::operator=(const PmergeMe &other)
 {
 	if (this != &other)
 	{
+		_group_size = other._group_size;
+
+		_compL = other._compL;
+		_orgL = other._orgL;
+		_list = other._list;
+		_jacobstalL = other._jacobstalL;
+		_actualJBL = other._actualJBL;
+
+		_compV = other._compV;
+		_orgV = other._orgV;
 		_vect = other._vect;
+		_jacobstalV = other._jacobstalV;
+		_actualJBV = other._actualJBV;
 	}
 	return (*this);
 }
@@ -122,7 +179,26 @@ void	PmergeMe::pmergeMe(const char **arg, int argc)
 
 	//crono 2
 	size_t timeL = 0;
-	//ccall //
+	// Parse
+	for (int i = 1; i < argc; i++)
+	{
+		t_numL	temp;
+		temp.value = ft_atoi(arg[i]);
+		_list.push_back(temp);
+	}
+
+	for (size_t t = 0; t < _list.size(); t++)
+	{
+		for (size_t v = t + 1; v < _list.size(); v++)
+		{
+			if (list_at(_list, t).value == list_at(_list, v).value)
+			{
+				std::cout << "Error: Can't accept duplicates!" << std::endl;
+				return ;
+			}
+		}
+	}
+	_orgL = _list;
 	//stop crono 2
 
 	std::cout << "Before: \t";
@@ -131,7 +207,7 @@ void	PmergeMe::pmergeMe(const char **arg, int argc)
 	std::cout << std::endl;
 
 	std::cout << "After: \t\t";
-	for (size_t i = 0; i < _vect.size(); i++)
+	for (size_t i = 0; i < _list.size(); i++)
 		std::cout << _vect[i].value << " ";
 	std::cout << std::endl;
 
@@ -139,7 +215,7 @@ void	PmergeMe::pmergeMe(const char **arg, int argc)
 		std::cout << "Comparations used (for vector): " << _compV << std::endl;
 
 	std::cout << "Time to process a range of " << _orgV.size() << " elements with std::vector: \t" << timeV << std::endl;
-	std::cout << "Time to process a range of 3000 elements with std::list: \t" << timeL << std::endl;
+	std::cout << "Time to process a range of " << _orgL.size() << " elements with std::list: \t\t" << timeL << std::endl;
 
 	std::cout << "Is <vector> sorted?\t::\t";
 	if (checkifSortedV(_vect))
@@ -147,8 +223,279 @@ void	PmergeMe::pmergeMe(const char **arg, int argc)
 	else
 		std::cout << "\033[0;31m" << "NOOO!!" << std::endl;
 	std::cout << "\033[0m" << std::endl;
+
+	std::cout << "Is <list> sorted?\t::\t";
+	if (checkifSortedL(_list))
+		std::cout << "\033[0;32m" << "YES" << std::endl;
+	else
+		std::cout << "\033[0;31m" << "NOOO!!" << std::endl;
+	std::cout << "\033[0m" << std::endl;
 }
 /* ----- */
+
+// -- Solved with `List` zone -->
+#pragma region LIST
+
+void	PmergeMe::printList(std::list<t_numL> lst, int all)
+{
+	for (size_t i = 0; i < lst.size(); i++)
+	{
+		std::cout << "[" << i << "] = " << list_at(lst, i).value << std::endl;
+		if (all)
+		{
+			std::cout << "   Groups: ";
+			for (size_t j = 0; j < list_at(lst, i)._group.size(); j++)
+			{
+				std::list<size_t>	tmp_g = list_at(lst, i)._group;
+				std::cout << list_at(tmp_g, j) << ", ";
+			}
+			std::cout << std::endl;
+		}
+	}
+	std::cout << std::endl;
+}
+
+bool	PmergeMe::checkifSortedL(std::list<t_numL> lst)
+{
+	for (size_t t = 0; t < lst.size(); t++)
+		for (size_t v = t + 1; v < lst.size(); v++)
+			if (list_at(lst, t).value > list_at(lst, t).value)
+				return (0);
+	return (1);
+}
+
+size_t	PmergeMe::nextJacobstalLDouble(size_t actual)
+{
+	if (_jacobstalL.size() == 0)
+	{
+		_jacobstalL.push_back(2);
+		_jacobstalL.push_back(2);
+		_jacobstalL.push_back(6);
+	}
+	if (actual >= _jacobstalL.size())
+	{
+		size_t	n = _jacobstalL.size();
+		size_t	next = list_at(_jacobstalL, n - 1) + 2 * list_at(_jacobstalL, n - 2);
+		next *= 2;
+		_jacobstalL.push_back(next);
+	}
+	return (actual);
+}
+
+size_t	PmergeMe::binarySearchL(std::list<t_numL> lst, size_t num)
+{
+	size_t	left = 0;
+	size_t	right = lst.size();
+	size_t	mid = (left + right) / 2;
+
+	// Num is the smaller one ->
+	if (num < lst.begin()->value)
+	{
+		_compL++;
+		return (0);
+	}
+	// Num is the bigger one ->
+	if (num > lst.back().value)
+	{
+		_compL++;
+		return (lst.size());
+	}
+	while (left < right)
+	{
+		mid = (left + right) / 2;
+		// In Middle (case 0 [1] 2 ...)
+		if (!(mid + 1 > lst.size()))
+		{
+			if (num > list_at(lst, mid).value && num < list_at(lst, mid + 1).value)
+			{
+				_compL++;
+				return (mid + 1);
+			}
+		}
+		// In Middle (case ... 3 [4] 5)
+		if (!(mid - 1 < 0))
+		{
+			if (num > list_at(lst, mid - 1).value && num < list_at(lst, mid).value)
+			{
+				_compL++;
+				return (mid);
+			}
+		}
+		if (num > list_at(lst, mid).value)
+		{
+			_compL++;
+			left = mid;
+		}
+		if (num < list_at(lst, mid).value)
+		{
+			_compL++;
+			right = mid;
+		}
+	}
+	return (mid);
+}
+
+size_t	PmergeMe::pairtoInsertL(std::list<t_numL> major, std::list<t_numL> minor)
+{
+	size_t to_insert = 0;
+	if (major.empty() || minor.empty())
+		return (0);
+	size_t	group_id = 0;
+	if (major.size())
+		group_id = major.begin()->_group.back();
+	for (to_insert = 0; to_insert < minor.size(); to_insert++)
+		if (!list_at(minor, to_insert)._group.empty())
+			if (list_at(minor, to_insert)._group.back() == group_id)
+				return (to_insert);
+	return (to_insert);
+}
+
+std::list<t_numL>	PmergeMe::popPositionL(std::list<t_numL> org, size_t pos)
+{
+	std::list<t_numL>	list;
+	for (size_t i = 0; i < org.size(); i++)
+		if (i != pos)
+			list.push_back(list_at(org, i));
+	org.clear();
+	return (list);
+}
+
+std::list<t_numL>	PmergeMe::pushPositionL(std::list<t_numL> org, t_numL to_push, size_t pos)
+{
+	std::list<t_numL>	tmp;
+	if (pos >= org.size())
+	{
+		org.push_back(to_push);
+		return (org);
+	}
+	for (size_t i = 0; i < org.size(); i++)
+	{
+		if (i != pos)
+			tmp.push_back(list_at(org, i));
+		else
+		{
+			tmp.push_back(to_push);
+			tmp.push_back(list_at(org, i));
+		}
+	}
+	return (tmp);
+}
+
+void	PmergeMe::mergeInsertionL(std::list<t_numL> sort)
+{
+	if (sort.size() <= 1)
+		return ;
+
+	std::list<t_numL>	major, minor;
+	size_t	gr = 0;
+	_group_size++;
+
+	// Separate into pairs
+	for (size_t v = 0; v < sort.size(); v++)
+	{
+		if (v + 1 >= sort.size())
+			minor.push_back(list_at(sort, v));
+		else
+		{
+			if (list_at(sort, v).value > list_at(sort, v + 1).value)
+			{
+				_compL++;
+				list_at(sort, v)._group.push_back(gr);
+				major.push_back(list_at(sort, v));
+				if (v + 1 < sort.size())
+				{
+					list_at(sort, v + 1)._group.push_back(gr);
+					minor.push_back(list_at(sort, v + 1));
+				}
+				v++;
+				gr++;
+			}
+			else if (list_at(sort, v).value < list_at(sort, v + 1).value)
+			{
+				_compL++;
+				list_at(sort, v)._group.push_back(gr);
+				if (v + 1 < sort.size())
+				{
+					list_at(sort, v + 1)._group.push_back(gr);
+					major.push_back(list_at(sort, v + 1));
+				}
+				minor.push_back(list_at(sort, v));
+				gr++;
+				v++;
+			}
+		}
+	}
+	// Keep separating the major stack until only have 1 element ->
+	mergeInsertionL(major);
+	_group_size--;
+
+	//* Insertion ->
+	//--> Look for minor number's pair in major stack
+	size_t	to_insert = 0;
+	if (major.size() == 1)
+		to_insert = pairtoInsertL(major, minor);
+	else
+		to_insert = pairtoInsertL(_list, minor);
+
+	sort.clear();
+	// Remember to remove the inserted element in minor stack!
+	minor = popPositionL(minor, to_insert);
+	if (major.size() == 1)
+		major.push_front(list_at(minor, to_insert));
+	else
+		_list.push_front(list_at(minor, to_insert));
+	_list = sort;
+	major.clear();
+
+	// Insert the restant elements in minor list ->
+	if (minor.size())
+	{
+		//--> Group the restant elements in groups, each one with size of respective Jacobstall serie x2
+		std::list<std::list<t_numL> >	groups;
+
+		size_t	e = 0;
+		_actualJBL = 0;
+		while (e < minor.size())
+		{
+			std::list<t_numL>	temp;
+			for (size_t j = 0; j < list_at(_jacobstalL, _actualJBL); j++)
+			{
+				if (e >= minor.size())
+					break ;
+				temp.push_back(list_at(minor, e));
+				e++;
+			}
+			groups.push_back(temp);
+			//Get next Jacobstal number
+			_actualJBL = nextJacobstalLDouble(++_actualJBL);
+		}
+		//--> In groups (n1, n2, etc..), insert first the larger index
+		/*	Group 1 & 2-> Insert first [1], later [0]
+		*	Group 3 -> Insert first [5], [4], [3] .. etc (if insuficient numbers, start by the larger index)
+		*	- Insert them in `sort` list using binary search.
+		*/
+		for (size_t i = 0; i < groups.size(); i++)
+		{
+			std::list<t_numL>	temp = list_at(groups, i);
+			size_t	j = temp.size() - 1;
+			while (j < temp.size())
+			{
+				to_insert = binarySearchL(_list, list_at(temp, j).value);
+				_list = pushPositionL(_list, list_at(temp, j), to_insert);
+				if (j == 0)
+					break ;
+				j--;
+			}
+		}
+	}
+
+	//Asegurate all numbers have the same group_size
+	for (size_t i = 0; i < _list.size(); i++)
+		while (list_at(_list, i)._group.size() > _group_size)
+			list_at(_list, i)._group.pop_back();
+}
+
+#pragma endregion
 
 // -- Solved with `Vector` zone -->
 #pragma region VECTOR
@@ -249,7 +596,7 @@ size_t	PmergeMe::binarySearchV(std::vector<t_numV> vec, size_t num)
 	return (mid);
 }
 
-size_t	PmergeMe::pairtoInsert(std::vector<t_numV> major, std::vector<t_numV> minor)
+size_t	PmergeMe::pairtoInsertV(std::vector<t_numV> major, std::vector<t_numV> minor)
 {
 	size_t to_insert = 0;
 	if (major.empty() || minor.empty())
@@ -347,9 +694,9 @@ void	PmergeMe::mergeInsertionV(std::vector<t_numV> sort)
 	//--> Look for minor number's pair in major stack
 	size_t	to_insert = 0;
 	if (major.size() == 1)
-		to_insert = pairtoInsert(major, minor);
+		to_insert = pairtoInsertV(major, minor);
 	else
-		to_insert = pairtoInsert(_vect, minor);
+		to_insert = pairtoInsertV(_vect, minor);
 
 	sort.clear();
 	sort.push_back(minor[to_insert]);
